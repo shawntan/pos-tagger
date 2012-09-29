@@ -70,11 +70,12 @@ public class Tagger {
 	}
 
 	private void viterbi(String[] words) {
-		Hashtable<String, String>[] t = new Hashtable[words.length + 1];
-		Hashtable<String, Float>[] V = new Hashtable[words.length + 1];
+		Hashtable<String, String>[] t	= new Hashtable[words.length + 1];
+		Hashtable<String, Float>[] V	= new Hashtable[words.length + 1];
 		V[0] = new Hashtable<String, Float>();
 		V[0].put("^", 1.0f);
 		for (int i = 0; i < words.length; i++) {
+			words[i] = words[i].toLowerCase();
 			V[i + 1] = new Hashtable<String, Float>();
 			t[i + 1] = new Hashtable<String, String>();
 			for (String currPOS : posCount.keySet()) {
@@ -144,14 +145,11 @@ public class Tagger {
 			Tagger t = new Tagger(reader);
 			t.setSmoother(t.new Smoother() {
 				public float tokenProbability(int posCount, int tokenCountPOS) {
-					return ((float) tokenCountPOS + 1)
-							/ (posCount + getUniqueWordCount());
+					return ((float) tokenCountPOS + 1) / (posCount + getUniqueWordCount());
 				}
 			});
 			reader.close();
-
-			t.viterbi("Trinity said it plans to begin delivery in the first quarter of next year .".split("\\s+"));
-
+			t.viterbi("Trinity said they plans to begin delivery in the first quarter of next year .".split("\\s+"));
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
