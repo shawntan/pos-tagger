@@ -16,8 +16,7 @@ public class build_tagger {
 			BufferedReader reader = new BufferedReader(new FileReader(fTrain));
 			Tagger t = new Tagger(reader);
 			reader.close();
-			System.out.println(t.posTransitions);
-			System.out.println(t.posTokCount);
+			//System.out.println(t.posTransitions);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
