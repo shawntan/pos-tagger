@@ -1,23 +1,27 @@
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.io.ObjectOutputStream;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Hashtable;
-import java.util.Map;
-import java.util.Map.Entry;
+import java.util.Set;
 
 public class Tagger {
 
+	final static private String DATAFILE = "tagger.dat";
 	private Hashtable<String, Hashtable<String, Integer>> posTransitions;
 	private Hashtable<String, Hashtable<String, Integer>> posTokCount;
 	private Hashtable<String, Integer> posCount;
 	private Hashtable<String, Integer> prevPosCount;
-	private HashSet<String> vocabulary;
+
 	private Smoother smoother;
+
+	private Set<String> vocabulary;
+	private Set<String> POS;
 
 	public Tagger(BufferedReader reader) throws IOException {
 		this.posTransitions = new Hashtable<String, Hashtable<String, Integer>>();
@@ -27,6 +31,8 @@ public class Tagger {
 		this.vocabulary = new HashSet<String>();
 		learn(reader);
 	}
+
+
 
 	public void setSmoother(Tagger.Smoother smoother) {
 		this.smoother = smoother;
@@ -59,6 +65,7 @@ public class Tagger {
 				prevPos = currPos;
 			}
 		}
+		POS = posCount.keySet();
 	}
 
 	private float tokProbGivenPOS(String pos, String tok) {
@@ -69,7 +76,7 @@ public class Tagger {
 		return smoother.tokenProbability(pc, c);
 	}
 
-	private void viterbi(String[] words) {
+	private String[] viterbi(String[] words) {
 		Hashtable<String, String>[] t	= new Hashtable[words.length + 1];
 		Hashtable<String, Float>[] V	= new Hashtable[words.length + 1];
 		V[0] = new Hashtable<String, Float>();
@@ -78,7 +85,7 @@ public class Tagger {
 			words[i] = words[i].toLowerCase();
 			V[i + 1] = new Hashtable<String, Float>();
 			t[i + 1] = new Hashtable<String, String>();
-			for (String currPOS : posCount.keySet()) {
+			for (String currPOS : POS) {
 				float maxProb = 0;
 				String maxPOS = null;
 				for (String prevPOS : V[i].keySet()) {
@@ -114,7 +121,25 @@ public class Tagger {
 			poss[i] = prevPOS;
 			prevPOS = t[i+1].get(prevPOS);
 		}
-		System.out.println(Arrays.toString(poss));
+		return poss;
+	}
+	
+	
+	public boolean[] testSentence(String line) {
+		String[] tokens = line.split("\\s+");
+		String[] words = new String[tokens.length];
+		String[] correctPOS = new String[tokens.length];
+		String prevPos = "^", currPos;
+		for (int i=0;i<tokens.length;i++) {
+			String tokPOS = tokens[i];
+			int seperator = tokPOS.lastIndexOf('/');
+			words[i] = tokPOS.substring(0, seperator).toLowerCase();
+			correctPOS[i] = tokPOS.substring(seperator + 1, tokPOS.length());
+		}
+		String[] predictedPOS = viterbi(words);
+		boolean[] correct = new boolean[tokens.length];
+		for(int i=0;i<correct.length;i++) correct[i] = predictedPOS[i].equals(correctPOS[i]);
+		return correct;
 	}
 
 	public abstract class Smoother {
@@ -145,11 +170,19 @@ public class Tagger {
 			Tagger t = new Tagger(reader);
 			t.setSmoother(t.new Smoother() {
 				public float tokenProbability(int posCount, int tokenCountPOS) {
-					return ((float) tokenCountPOS + 1) / (posCount + getUniqueWordCount());
+					return ((float) tokenCountPOS + 1)
+							/ (posCount + getUniqueWordCount());
 				}
 			});
 			reader.close();
-			t.viterbi("Trinity said they plans to begin delivery in the first quarter of next year .".split("\\s+"));
+			//t.viterbi("Trinity have said they plan to begin delivery in the first quarter of next year ."
+			System.out.println(
+				Arrays.toString(
+					t.testSentence(
+			"PRECIOUS/NNP METALS/NNPS :/: Futures/NNP prices/NNS eased/VBD as/RB increased/VBN stability/NN and/CC strength/NN came/VBD into/IN the/DT securities/NNS markets/NNS ./."
+					)
+				)
+			);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {

@@ -1,12 +1,28 @@
-import java.io.BufferedInputStream;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 
 public class build_tagger {
 
+	
+	public void save(String datafile, Tagger t) {
+		
+		File f = new File(datafile);
+		try {
+			ObjectOutputStream oos = new ObjectOutputStream(
+					new FileOutputStream(f));
+			oos.writeObject(t);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 	public static void main(String[] args) {
 		String sentsTrain = args[0];
 		//String sentsTest  = args[2];
