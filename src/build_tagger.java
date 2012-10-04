@@ -31,6 +31,7 @@ public class build_tagger {
 		try {
 			BufferedReader reader = new BufferedReader(new FileReader(fTrain));
 			Tagger t = new Tagger(reader);
+		
 			reader.close();
 			//System.out.println(t.posTransitions);
 		} catch (FileNotFoundException e) {
