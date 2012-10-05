@@ -5,6 +5,7 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -12,10 +13,9 @@ import java.util.Set;
 
 import javax.management.RuntimeErrorException;
 
-public class Tagger {
+public class Tagger implements Serializable {
 
-	final static private String DATAFILE = "tagger.dat";
-	final static private boolean DEBUG = true;
+	final static private boolean DEBUG = false;
 	private Hashtable<String, Hashtable<String, Integer>> posTransitions;
 	private Hashtable<String, Hashtable<String, Integer>> posTokCount;
 	private Hashtable<String, Integer> posCount;
@@ -24,7 +24,6 @@ public class Tagger {
 	private Smoother smoother;
 
 	private Set<String> vocabulary;
-	private Set<String> POS;
 
 	public Tagger(BufferedReader reader) throws IOException {
 		this.posTransitions = new Hashtable<String, Hashtable<String, Integer>>();
@@ -66,7 +65,6 @@ public class Tagger {
 				prevPos = currPos;
 			}
 		}
-		POS = posCount.keySet();
 	}
 
 	private double tokProbGivenPOS(String pos, String tok) {
@@ -87,6 +85,7 @@ public class Tagger {
 	}
 	
 	private String[] viterbi(String[] words) {
+		Set<String> POS = posCount.keySet();
 		Hashtable<String, String>[] t =	new Hashtable[words.length + 1];
 		Hashtable<String,Double>[] V =	new Hashtable[words.length + 1];
 		V[0] = new Hashtable<String, Double>();
@@ -171,29 +170,5 @@ public class Tagger {
 		}
 	}
 
-	public static void main(String[] args) {
-		String sentsTrain = args[0];
-		File fTrain = new File(sentsTrain);
 
-		try {
-			BufferedReader reader = new BufferedReader(new FileReader(fTrain));
-			Tagger t = new Tagger(reader);
-			t.setSmoother(t.new Smoother() {
-				public double tokenProbability(int posCount, int tokenCountPOS) {
-					return ((double) tokenCountPOS + 1)/(posCount + getUniqueWordCount());
-				}
-				public double transitionProbability(int prevPOS, int currPOS) {
-					return ((double)currPOS + 1)/ (prevPOS + getUniqueWordCount());
-				}
-			});
-			reader.close();
-			System.out.println(Arrays.toString(
-					t.testSentence("For/IN six/CD years/NNS ,/, T./NNP Marshall/NNP Hahn/NNP Jr./NNP has/VBZ made/VBN corporate/JJ acquisitions/NNS in/IN the/DT George/NNP Bush/NNP mode/NN :/: kind/JJ and/CC gentle/JJ ./.")));
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-	}
 }

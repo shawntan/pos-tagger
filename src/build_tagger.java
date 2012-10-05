@@ -10,7 +10,7 @@ import java.io.ObjectOutputStream;
 public class build_tagger {
 
 	
-	public void save(String datafile, Tagger t) {
+	public static void save(String datafile, Tagger t) {
 		
 		File f = new File(datafile);
 		try {
@@ -24,14 +24,16 @@ public class build_tagger {
 		}
 	}
 	public static void main(String[] args) {
-		String sentsTrain = args[0];
+		int c = 0;
+		String sentsTrain = args[c++];
+		String modelFile  = args[c++];
 		//String sentsTest  = args[2];
 		File fTrain = new File(sentsTrain);
 		//File fTest  = new File(sentsTest);
 		try {
 			BufferedReader reader = new BufferedReader(new FileReader(fTrain));
 			Tagger t = new Tagger(reader);
-		
+			save(modelFile,t);
 			reader.close();
 			//System.out.println(t.posTransitions);
 		} catch (FileNotFoundException e) {
