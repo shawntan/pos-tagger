@@ -74,30 +74,52 @@ public class build_tagger {
 			System.out.printf("%5s ", pos);
 		System.out.println();
 
-		int pi=0,ci=0;
-		int[] tpCounts =	new int[posList.length()];
-		int[] tpfnCounts =	new int[posList.length()];
-		int[] tpfpCounts = new int[posList.length()];
+		int col=0,row=0;
+		int[] tpCounts 		= new int[posList.size()];
+		int[] tpfnCounts	= new int[posList.size()];
+		int[] tpfpCounts	= new int[posList.size()];
 
 		for (String correctPOS : posList) {
 			System.out.printf("%5s\t", correctPOS);
 			Hashtable<String, Integer> predTable = confusionMatrix.get(correctPOS);
 			int fntpCounts = 0; 
-			pi=0;
+			col=0;
 			for (String predictedPOS : posList) {
 				int val = 	predTable.containsKey(predictedPOS) ? predTable.get(predictedPOS) : 0;
 				System.out.printf("%5d ",val);
 
-				if (pi==ci) tpCounts[pi] += val;
-				tpfnCounts[pi] += val;
-				tpfpCounts[ci] += val;
+				if (col==row) tpCounts[col] = val;
+				tpfnCounts[row] += val;
+				tpfpCounts[col] += val;
 
-				pi++;
+				col++;
 			}
-			System.out.println();
-			ci++;
+			System.out.println("\n");
+			row++;
 		}
+		System.out.printf("%5s\t%5s\t%5s\t%s\n", "POS","Rec.","Prec.","F1");
+		int i=0,count=0;
+		double precSum=0,recSum=0,f1Sum=0;
+		for (String pos : posList) {
+			double precision	= ((double)tpCounts[i])/tpfpCounts[i];
+			double recall		= ((double)tpCounts[i])/tpfnCounts[i];
+			double f1measure	= 2*precision*recall/(recall + precision);
+			
+			if(!(Double.isNaN(precision) || Double.isNaN(recall))) {
+				precSum += precision;
+				recSum	+= recall;
+				f1Sum	+= f1measure;
+				count ++; 
+			}
+
+			System.out.printf("%5s\t%5.4f\t%5.4f\t%5.4f\n",pos,precision,recall,f1measure);
+			i++;
+		}
+		System.out.println("\n");
+		System.out.printf("%5s\t%5.4f\t%5.4f\t%5.4f\n","",precSum/count,recSum/count,f1Sum/count);
+		
 	}
+	
 
 	private static Tagger.Smoother wbBuilder(Tagger t) {
 		Tagger.Smoother wb = t.new Smoother() {
