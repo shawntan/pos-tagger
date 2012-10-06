@@ -1,4 +1,3 @@
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -12,9 +11,8 @@ import java.util.List;
 
 public class build_tagger {
 
-	
 	public static void save(String datafile, Tagger t) {
-		
+
 		File f = new File(datafile);
 		try {
 			ObjectOutputStream oos = new ObjectOutputStream(
@@ -27,8 +25,9 @@ public class build_tagger {
 			e.printStackTrace();
 		}
 	}
-	
-	public static void testSentence(Tagger t, String line, Hashtable<String,Hashtable<String,Integer>> confusionMatrix) {
+
+	public static void testSentence(Tagger t, String line,
+			Hashtable<String, Hashtable<String, Integer>> confusionMatrix) {
 		String[] tokens = line.split("\\s+");
 		String[] words = new String[tokens.length];
 		String[] correctPOS = new String[tokens.length];
@@ -39,69 +38,143 @@ public class build_tagger {
 			correctPOS[i] = tokPOS.substring(seperator + 1, tokPOS.length());
 		}
 		String[] predictedPOS = t.getTags(words);
-		for(int i=0;i<predictedPOS.length;i++) countMatrix(confusionMatrix, correctPOS[i], predictedPOS[i]);
+		for (int i = 0; i < predictedPOS.length; i++)
+			countMatrix(confusionMatrix, correctPOS[i], predictedPOS[i]);
 	}
-	
-	public static Hashtable<String,Hashtable<String,Integer>> confusionMatrix(Tagger t,BufferedReader reader) {
-		Hashtable<String,Hashtable<String,Integer>> cMat = new Hashtable<String,Hashtable<String,Integer>>();
+
+	public static Hashtable<String, Hashtable<String, Integer>> confusionMatrix(
+			Tagger t, BufferedReader reader) {
+		Hashtable<String, Hashtable<String, Integer>> cMat = new Hashtable<String, Hashtable<String, Integer>>();
 		String line;
 		try {
 			while ((line = reader.readLine()) != null)
-				testSentence(t,line,cMat);
+				testSentence(t, line, cMat);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return cMat;
 	}
-	
-	public static void countMatrix(Hashtable<String,Hashtable<String,Integer>> confusionMatrix, String truePOS, String predPOS) {
-		Hashtable<String,Integer> tbl = confusionMatrix.get(truePOS);
 
-		if (tbl == null) tbl = new Hashtable<String,Integer>();
-		tbl.put(predPOS, (tbl.containsKey(predPOS)?tbl.get(predPOS):0) + 1);
+	public static void countMatrix(
+			Hashtable<String, Hashtable<String, Integer>> confusionMatrix,
+			String truePOS, String predPOS) {
+		Hashtable<String, Integer> tbl = confusionMatrix.get(truePOS);
+
+		if (tbl == null)
+			tbl = new Hashtable<String, Integer>();
+		tbl.put(predPOS, (tbl.containsKey(predPOS) ? tbl.get(predPOS) : 0) + 1);
 		confusionMatrix.put(truePOS, tbl);
 	}
-	
-	
-	public static void printMatrix(Hashtable<String,Hashtable<String,Integer>> confusionMatrix) {
+
+	public static void printMatrix(
+			Hashtable<String, Hashtable<String, Integer>> confusionMatrix) {
 		List<String> posList = new ArrayList<String>(confusionMatrix.keySet());
-		System.out.printf("%5s\t","");
-		for (String pos:posList) System.out.printf("%5s ", pos);
+		System.out.printf("%5s\t", "");
+		for (String pos : posList)
+			System.out.printf("%5s ", pos);
 		System.out.println();
-		for (String correctPOS:posList) {
+		for (String correctPOS : posList) {
 			System.out.printf("%5s\t", correctPOS);
-			Hashtable<String,Integer> predTable = confusionMatrix.get(correctPOS);
-			for(String predictedPOS:posList) {
-				System.out.printf("%5d ", predTable.containsKey(predictedPOS)?predTable.get(predictedPOS):0);
+			Hashtable<String, Integer> predTable = confusionMatrix
+					.get(correctPOS);
+			for (String predictedPOS : posList) {
+				System.out.printf(
+						"%5d ",
+						predTable.containsKey(predictedPOS) ? predTable
+								.get(predictedPOS) : 0);
 			}
 			System.out.println();
 		}
 	}
-	
+
+	private static Tagger.Smoother wbBuilder(Tagger t) {
+		Tagger.Smoother wb = t.new Smoother() {
+			public double gamma(String ctx) {
+				return 1;
+			}
+			public double alpha(String ctx, String cur) {
+				int ctxCount	= countCtx.get(ctx);
+				int ctxCurCount	= countCtxCur.get(ctx).get(cur);
+				return ((double)ctxCurCount)/(ctxCount + countCtxCur.get(ctx).size());
+			}
+			public double pSmooth(String ctx, String w) {
+				int ctxCount = countCtx.get(ctx);
+				int Z = vocab.size() - countCtxCur.get(ctx).size();
+				int T = countCtxCur.get(ctx).size();
+				double val = Math.log(T) - ( Math.log(Z) +  Math.log(ctxCount + T));
+				double unlogged = Math.exp(val);
+				return unlogged;
+			}
+		};
+		return wb;
+	}
+	private static Tagger.Smoother knBuilder(Tagger t) {
+		Tagger.Smoother kneserNey = t.new Smoother() {
+			double D = 0.75;
+			int sumUnique = -1;
+
+			private int countUnique() {
+				if (sumUnique == -1) {
+					for (Hashtable<String, Integer> curs : countCurCtx.values()) {
+						sumUnique += curs.size();
+					}
+				}
+				return sumUnique;
+			}
+
+			public double alpha(String ctx, String cur) {
+				return ((double) countCtxCur.get(ctx).get(cur) - D)
+						/ (countCtx.get(ctx) + vocab.size());
+			}
+
+			public double gamma(String ctx) {
+				int Cctx = countCtx.get(ctx);
+				int Cseen = countCtxCur.get(ctx).size();
+				return ((double) D * Cseen / Cctx);
+			}
+
+			public double pSmooth(String ctx, String cur) {
+				//System.out.println(countCurCtx);
+				try {
+					return ((double) countCurCtx.get(cur).size()/countUnique());
+				}
+				catch (Exception e) {
+					System.out.println(cur + " " + countCurCtx.get(cur));
+					return 0;
+				}
+				
+				
+			}
+		};
+		return kneserNey;
+	}
 	public static void main(String[] args) {
 		int c = 0;
 		String sentsTrain = args[c++];
-		String sentsTest  = args[c++];
-		String modelFile  = args[c++];
-		
+		String sentsTest = args[c++];
+		String modelFile = args[c++];
+
 		File fTrain = new File(sentsTrain);
-		File fTest  = new File(sentsTest);
-		//File fTest  = new File(sentsTest);
+		File fTest = new File(sentsTest);
+		// File fTest = new File(sentsTest);
 		try {
 			BufferedReader reader = new BufferedReader(new FileReader(fTrain));
-			System.out.printf("Learning tags using data from %s...\n",sentsTrain);
+			System.out.printf("Learning tags using data from %s...\n",
+					sentsTrain);
 			Tagger t = new Tagger(reader);
 			System.out.println("Saving model...");
-			save(modelFile,t);
+			save(modelFile, t);
+
+			//t.setSmootherPosPos(wbBuilder(t));
+			//t.setSmootherPosWord(wbBuilder(t));
 			reader.close();
 			reader = new BufferedReader(new FileReader(fTest));
-			System.out.printf("Testing model using data from %s...\n",sentsTest);
-			printMatrix(confusionMatrix(t,reader));
-			
+			System.out.printf("Testing model using data from %s...\n",
+					sentsTest);
+			printMatrix(confusionMatrix(t, reader));
 			reader.close();
-			
-			//System.out.println(t.posTransitions);
+			// System.out.println(t.posTransitions);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {

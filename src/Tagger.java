@@ -17,40 +17,48 @@ public class Tagger implements Serializable {
 
 	final static private boolean DEBUG = false;
 	final static private String START = "^";
-	final static private String END = "$";
 	
-	private Hashtable<String, Hashtable<String, Integer>>	posTransitions;
-	private Hashtable<String, Hashtable<String, Integer>>	posTokCount;
-	private Hashtable<String, Integer>						posCount;
-	private Hashtable<String, Integer>						prevPosCount;
+	private Hashtable<String, Hashtable<String, Integer>>	countPos1Pos2;
+	private Hashtable<String, Integer>						countPos1;
+	private Hashtable<String, Hashtable<String, Integer>>	countPos2Pos1;
+	private Hashtable<String, Integer>						countPos2;
+	private Hashtable<String, Hashtable<String, Integer>>	countPosTok;
+	private Hashtable<String, Integer>						countPos;
+	private Hashtable<String, Hashtable<String, Integer>>	countTokPos;
+	private Hashtable<String, Integer>						countTok;
 
 	private Smoother smootherPosWord;
 	private Smoother smootherPosPos;
 
-	private Set<String> vocabulary;
-
 	public Tagger(BufferedReader reader) throws IOException {
-		this.posTransitions = new Hashtable<String, Hashtable<String, Integer>>();
-		this.posTokCount = new Hashtable<String, Hashtable<String, Integer>>();
-		this.posCount = new Hashtable<String, Integer>();
-		this.prevPosCount = new Hashtable<String, Integer>();
-		this.vocabulary = new HashSet<String>();
+		this.countPos1Pos2		= new Hashtable<String, Hashtable<String, Integer>>();
+		this.countPos2Pos1		= new Hashtable<String, Hashtable<String, Integer>>();
+		this.countPosTok		= new Hashtable<String, Hashtable<String, Integer>>();
+		this.countTokPos		= new Hashtable<String, Hashtable<String, Integer>>();
+		this.countPos			= new Hashtable<String, Integer>();
+		this.countTok			= new Hashtable<String, Integer>();
+		this.countPos1			= new Hashtable<String, Integer>();
+		this.countPos2			= new Hashtable<String, Integer>();
 		learn(reader);
 	}
 
 	public void setSmootherPosWord(Tagger.Smoother smoother) {
 		this.smootherPosWord = smoother;
-		this.smootherPosWord.countCtx = this.posCount;
-		this.smootherPosWord.countCtxCur = this.posTokCount;
-		this.smootherPosWord.vocab = this.vocabulary;
+		this.smootherPosWord.countCtx 		= this.countPos;
+		this.smootherPosWord.countCtxCur	= this.countPosTok;
+		this.smootherPosWord.countCur 		= this.countTok;
+		this.smootherPosWord.countCurCtx	= this.countTokPos;
+		this.smootherPosWord.vocab = new HashSet<String>(this.countTok.keySet());
 	}
 	public void setSmootherPosPos(Tagger.Smoother smoother) {
-		this.smootherPosPos = smoother;
-		this.smootherPosPos.countCtx = this.prevPosCount;
-		this.smootherPosPos.countCtxCur = this.posTransitions;
-		this.smootherPosPos.vocab = new HashSet<String>(this.posCount.keySet());
+		this.smootherPosPos = smoother;	
+		this.smootherPosPos.countCtx		= this.countPos1;
+		this.smootherPosPos.countCtxCur		= this.countPos1Pos2;
+		this.smootherPosPos.countCur		= this.countPos2;
+		this.smootherPosPos.countCurCtx		= this.countPos2Pos1;
+		this.smootherPosPos.vocab = new HashSet<String>(this.countPos.keySet());
 	}
-
+	
 	public void add(Hashtable<String, Hashtable<String, Integer>> table,
 			Hashtable<String, Integer> occCount, String w1, String w2) {
 		Hashtable<String, Integer> w2count;
@@ -59,7 +67,7 @@ public class Tagger implements Serializable {
 			w2count.put(w2, 0);
 		}
 		Integer c;
-		w2count.put(w2, ((c = w2count.get(w2)) == null ? 0 : c) + 1);
+		w2count.put(w2,  ((c = w2count.get(w2)) == null ? 0 : c) + 1);
 		occCount.put(w1, ((c = occCount.get(w1)) == null ? 0 : c) + 1);
 	}
 
@@ -72,26 +80,27 @@ public class Tagger implements Serializable {
 				int seperator = tokPOS.lastIndexOf('/');
 				String token = filterToken(tokPOS.substring(0, seperator));
 				currPos = tokPOS.substring(seperator + 1, tokPOS.length());
-				add(posTransitions, prevPosCount, prevPos, currPos);
-				add(posTokCount, posCount, currPos, token);
-				vocabulary.add(token);
+				add(countPos1Pos2, countPos1, prevPos, currPos);
+				add(countPos2Pos1, countPos2, currPos, prevPos);
+				add(countPosTok, countPos, currPos, token);
+				add(countTokPos, countTok, token, currPos);
 				prevPos = currPos;
 			}
 		}
-		setSmootherPosWord(new Smoother() {});
 		setSmootherPosPos(new Smoother() {});
+		setSmootherPosWord(new Smoother() {});
 	}
 
 	private double tokProbGivenPOS(String pos, String tok) {
 		Hashtable<String,Integer> ht;
-		if((ht = posTokCount.get(pos))!=null && ht.containsKey(tok))
+		if((ht = countPosTok.get(pos))!=null && ht.containsKey(tok))
 			return smootherPosWord.alpha(pos, tok);
 		else return smootherPosWord.gamma(pos)*smootherPosWord.pSmooth(pos, tok);
 	}
 	
 	private double posTransitions(String pos1, String pos2) {
 		Hashtable<String,Integer> ht;
-		if((ht = posTransitions.get(pos1))!=null && ht.containsKey(pos2))
+		if((ht = countPos1Pos2.get(pos1))!=null && ht.containsKey(pos2))
 			return smootherPosPos.alpha(pos1, pos2);
 		else return smootherPosPos.gamma(pos1)*smootherPosPos.pSmooth(pos1, pos2);
 	}
@@ -102,7 +111,7 @@ public class Tagger implements Serializable {
 		return token;
 	}
 	public String[] getTags(String[] words) {
-		Set<String> POS = posCount.keySet();
+		Set<String> POS = countPos.keySet();
 		Hashtable<String, String>[] t =	new Hashtable[words.length + 1];
 		Hashtable<String,Double>[] V =	new Hashtable[words.length + 1];
 		V[0] = new Hashtable<String, Double>();
@@ -152,15 +161,15 @@ public class Tagger implements Serializable {
 	}
 	
 	public abstract class Smoother implements Serializable {
-		Hashtable<String,Integer> countCtx; 
 		Hashtable<String,Hashtable<String,Integer>> countCtxCur;
+		Hashtable<String,Integer> 					countCtx;
+		Hashtable<String,Hashtable<String,Integer>> countCurCtx;
+		Hashtable<String,Integer>					countCur;
 		Set<String> vocab;
 		
 		public double alpha(String ctx, String cur) {
-			
 			return (countCtxCur.get(ctx).get(cur) + 1)/
 					(double)(countCtx.get(ctx) + vocab.size());
-
 		}
 		
 		public double gamma(String ctx) {
