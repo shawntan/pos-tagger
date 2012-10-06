@@ -67,24 +67,35 @@ public class build_tagger {
 		confusionMatrix.put(truePOS, tbl);
 	}
 
-	public static void printMatrix(
-			Hashtable<String, Hashtable<String, Integer>> confusionMatrix) {
+	public static void printMatrix(Hashtable<String, Hashtable<String, Integer>> confusionMatrix) {
 		List<String> posList = new ArrayList<String>(confusionMatrix.keySet());
 		System.out.printf("%5s\t", "");
 		for (String pos : posList)
 			System.out.printf("%5s ", pos);
 		System.out.println();
+
+		int pi=0,ci=0;
+		int[] tpCounts =	new int[posList.length()];
+		int[] tpfnCounts =	new int[posList.length()];
+		int[] tpfpCounts = new int[posList.length()];
+
 		for (String correctPOS : posList) {
 			System.out.printf("%5s\t", correctPOS);
-			Hashtable<String, Integer> predTable = confusionMatrix
-					.get(correctPOS);
+			Hashtable<String, Integer> predTable = confusionMatrix.get(correctPOS);
+			int fntpCounts = 0; 
+			pi=0;
 			for (String predictedPOS : posList) {
-				System.out.printf(
-						"%5d ",
-						predTable.containsKey(predictedPOS) ? predTable
-								.get(predictedPOS) : 0);
+				int val = 	predTable.containsKey(predictedPOS) ? predTable.get(predictedPOS) : 0;
+				System.out.printf("%5d ",val);
+
+				if (pi==ci) tpCounts[pi] += val;
+				tpfnCounts[pi] += val;
+				tpfpCounts[ci] += val;
+
+				pi++;
 			}
 			System.out.println();
+			ci++;
 		}
 	}
 
@@ -170,7 +181,8 @@ public class build_tagger {
 			//t.setSmootherPosWord(wbBuilder(t));
 			reader.close();
 			reader = new BufferedReader(new FileReader(fTest));
-			System.out.printf("Testing model using data from %s...\n",
+			System.out.printf(
+					"Testing model using data from %s...\n",
 					sentsTest);
 			printMatrix(confusionMatrix(t, reader));
 			reader.close();
