@@ -1,6 +1,39 @@
-\documentclass[]{/home/shawn/latex/homework}
-
+\documentclass[12pt]{homework}
+\newcommand{\transprob}{\P{s_i}{s_{i-1}}}
+\newcommand{\obsprob}{\P{w}{s}}
+\title{}
+\author{}
+\date{}
 \begin{document}
+\maketitle
 \header{CS4248}{Assignment 2}{U096883L Shawn Tan}
 \section{Introduction}
+
+This assignment requires us to build a Part-of-Speech (POS) tagger, using 
+training data from part of the Penn Treebank. The method used in our approach 
+has to employ a Hidden Markov Model (HMM). This entails learning from the 
+training data a set of parameters required for the HMM. Table \ref{parameters} 
+shows the various sets of data we have to collect for this particular 
+assignment.
+
+In the following sections, we will explain in detail how individual aspects of 
+the HMM was created, and experiment with two simple smoothing techniques, 
+Laplace and Witten-Bell smoothing. The two techinques will be evaluated 
+according to their precision, recall and F1 measures.
+
+\begin{table}
+	\begin{center}
+	\begin{tabular}{l l}
+		\hline
+		Name			&	Description\\
+		\hline
+		$V$				&	all unique words\\
+		$S$				&	all unique POS tags\\
+		$\transprob$	&	transition probability from one POS tag to another\\
+		$\obsprob$		&	probability of seeing a word given a POS tag\\
+		\hline
+	\end{tabular}
+	\end{center}
+	\label{parameters}\caption{Parameters for a POS tagger HMM}
+\end{table}
 \end{document}

@@ -15,6 +15,10 @@ import javax.management.RuntimeErrorException;
 
 public class Tagger implements Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -995737530034898495L;
 	final static private boolean DEBUG = false;
 	final static private String START = "^";
 	

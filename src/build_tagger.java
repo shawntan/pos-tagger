@@ -46,13 +46,18 @@ public class build_tagger {
 			Tagger t, BufferedReader reader) {
 		Hashtable<String, Hashtable<String, Integer>> cMat = new Hashtable<String, Hashtable<String, Integer>>();
 		String line;
+		long timeStart = System.currentTimeMillis();
+		int count =0;
 		try {
-			while ((line = reader.readLine()) != null)
+			while ((line = reader.readLine()) != null) {
 				testSentence(t, line, cMat);
+				count ++;
+			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		System.out.printf("Took %d ms to tag %d lines. \n",System.currentTimeMillis()-timeStart,count);
 		return cMat;
 	}
 
@@ -199,8 +204,8 @@ public class build_tagger {
 			System.out.println("Saving model...");
 			save(modelFile, t);
 
-			//t.setSmootherPosPos(wbBuilder(t));
-			//t.setSmootherPosWord(wbBuilder(t));
+			t.setSmootherPosPos(wbBuilder(t));
+			t.setSmootherPosWord(wbBuilder(t));
 			reader.close();
 			reader = new BufferedReader(new FileReader(fTest));
 			System.out.printf(
