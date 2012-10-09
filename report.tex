@@ -17,9 +17,10 @@ shows the various sets of data we have to collect for this particular
 assignment.
 
 In the following sections, we will explain in detail how individual aspects of 
-the HMM was created, and experiment with two simple smoothing techniques, 
-Laplace and Witten-Bell smoothing. The two techinques will be evaluated 
-according to their precision, recall and F1 measures.
+the HMM was created, outlining some of the technical difficulties faced. We also  
+experiment with two simple smoothing techniques, Laplace (add-one) and 
+Witten-Bell smoothing. The two techniques will be evaluated according to their 
+precision, recall and F1 measures.
 
 \begin{table}
 	\begin{center}
@@ -36,4 +37,16 @@ according to their precision, recall and F1 measures.
 	\end{center}
 	\label{parameters}\caption{Parameters for a POS tagger HMM}
 \end{table}
+\section{Learning from \texttt{sents.train}}
+The \texttt{sents.train} dataset contains 39,832 lines, each word annotated with 
+POS tags.
+
+In order to extract the relevant information we count.
+
+In order to obtain $\transprob$, we need to count the different number of times 
+one tag is followed by another. For each line, we extract the POS for each 
+token, leaving a list of POS tags. We then prepend a `\^' at the beginning, and 
+a `\$' character at the end. This ensures that the probabilities for a given POS 
+starting a sentence are also taken into account
+ 
 \end{document}
