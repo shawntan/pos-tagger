@@ -80,7 +80,6 @@ public class build_tagger {
 		for (String pos : posList)
 			System.out.printf("%5s ", pos);
 		System.out.println();
-
 		int col = 0, row = 0;
 		int[] tpCounts = new int[posList.size()];
 		int[] tpfnCounts = new int[posList.size()];
@@ -96,12 +95,10 @@ public class build_tagger {
 				int val = predTable.containsKey(predictedPOS) ? predTable
 						.get(predictedPOS) : 0;
 				System.out.printf("%5d ", val);
-
 				if (col == row)
 					tpCounts[col] = val;
 				tpfnCounts[row] += val;
 				tpfpCounts[col] += val;
-
 				col++;
 			}
 			System.out.println("\n");
@@ -221,8 +218,8 @@ public class build_tagger {
 			System.out.println("Saving model...");
 			save(modelFile, t);
 
-			t.setSmootherPosPos(wbBuilder(t));
-			t.setSmootherPosWord(wbBuilder(t));
+			//t.setSmootherPosPos(wbBuilder(t));
+			//t.setSmootherPosWord(wbBuilder(t));
 			reader.close();
 			reader = new BufferedReader(new FileReader(fTest));
 			System.out.printf("Testing model using data from %s...\n",
