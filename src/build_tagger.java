@@ -108,18 +108,25 @@ public class build_tagger {
 			row++;
 		}
 		System.out.printf("%5s\t%5s\t%5s\t%s\n", "POS", "Rec.", "Prec.", "F1");
-		int i = 0, count = 0;
+		int i = 0;
 		double precSum = 0, recSum = 0, f1Sum = 0;
+		int  precCount = 0, recCount = 0, f1Count = 0;
 		for (String pos : posList) {
 			double precision = ((double) tpCounts[i]) / tpfpCounts[i];
 			double recall = ((double) tpCounts[i]) / tpfnCounts[i];
 			double f1measure = 2 * precision * recall / (recall + precision);
 
-			if (!(Double.isNaN(precision) || Double.isNaN(recall))) {
+			if (!Double.isNaN(precision)){
 				precSum += precision;
+				precCount++;
+			}
+			if (!Double.isNaN(recall)){
 				recSum += recall;
+				recCount++;
+			}
+			if (!Double.isNaN(f1measure)) {
 				f1Sum += f1measure;
-				count++;
+				f1Count++;
 			}
 
 			System.out.printf("%5s\t%5.4f\t%5.4f\t%5.4f\n", pos, precision,
@@ -127,8 +134,8 @@ public class build_tagger {
 			i++;
 		}
 		System.out.println("\n");
-		System.out.printf("%5s\t%5.4f\t%5.4f\t%5.4f\n", "", precSum / count,
-				recSum / count, f1Sum / count);
+		System.out.printf("%5s\t%5.4f\t%5.4f\t%5.4f\n", "", precSum / precCount,
+				recSum / recCount, f1Sum / f1Count);
 
 	}
 
