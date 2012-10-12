@@ -1,17 +1,9 @@
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Set;
-
-import javax.management.RuntimeErrorException;
 
 public class Tagger implements Serializable {
 
@@ -165,6 +157,10 @@ public class Tagger implements Serializable {
 	}
 	
 	public abstract class Smoother implements Serializable {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -1349808820264498844L;
 		Hashtable<String,Hashtable<String,Integer>> countCtxCur;
 		Hashtable<String,Integer> 					countCtx;
 		Hashtable<String,Hashtable<String,Integer>> countCurCtx;
