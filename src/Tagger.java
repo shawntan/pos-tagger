@@ -72,7 +72,8 @@ public class Tagger implements Serializable {
 		while ((line = reader.readLine()) != null) {
 			String[] tokens = line.split("\\s+");
 			String prevPos = START, currPos;
-			for (String tokPOS : tokens) {
+			for (int i=0;i<tokens.length;i++) {
+				String tokPOS = tokens[i];
 				int seperator = tokPOS.lastIndexOf('/');
 				String token = filterToken(tokPOS.substring(0, seperator));
 				currPos = tokPOS.substring(seperator + 1, tokPOS.length());
@@ -103,9 +104,10 @@ public class Tagger implements Serializable {
 	
 	private String filterToken(String token) {
 		token = token.toLowerCase();
-		token = token.replaceAll("[0-9]", "#");
+		token = token.replaceAll("[0-9]", "\\#");
 		return token;
 	}
+	
 	public String[] getTags(String[] words) {
 		Set<String> POS = countPos.keySet();
 		Hashtable<String, String>[] t =	new Hashtable[words.length + 1];

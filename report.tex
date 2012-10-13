@@ -48,8 +48,11 @@ beginning, and a `\$' character at the end. This ensures that the probabilities
 for a given POS starting a sentence are also taken into account.
 
 Another preprocessing step performed was to change all instances of numeric 
-tokens, and replacing all digits with \#. For example, `\$25.50' will be 
-converted to `\$\#\#.\#\#'.
+tokens, and replacing all digits with \textbackslash\#. For example, `\$25.50' 
+will be converted to 
+`\$\textbackslash\#\textbackslash\#.\textbackslash\#\textbackslash\# '. This 
+reduces the many different combinations of numbers down to a common token that 
+would have a higher probability given the tag CD.
 
 Going through the file, we maintain a dictionary of the following items:
 \begin{center}
@@ -74,30 +77,30 @@ We performed evaluation for the POS tagger using two types of smoothing methods,
 Laplace smoothing using $B=1$ (or add-one smoothing) and Witten-Bell smoothing.  
 The tagger performs smoothing for both conditional probabilities, $\P{w}{q}$ and 
 $\P{q_t}{q_{t-1}}$.
-\subsection{Add-one smoothing}
-Using the add-one smoothing, we run 10-fold cross validation using
+
+\subsection{Different smoothing methods}
+Using the \textbf{add-one smoothing}, we run 10-fold cross validation using
 \texttt{sents.out}. The results are shown in Table \ref{addoneresult}.
 
 \begin{table}
 	\begin{center}
-	\begin{tabular}{r | l l l}
-		\hline
-		&	Recall	&	Precision& $F1$ \\
-		\hline
-	Fold 1	 &	0.8645  &	0.7569	 &	0.8618\\
-	Fold 2	 &	0.8722	&	0.7702	 &	0.8775\\
-	Fold 3	 &	0.8726	&	0.7776	 &	0.8656\\
-	Fold 4	 &	0.8794	&	0.7599	 &	0.8322\\
-	Fold 5	 &	0.8924	&	0.7920	 &	0.8626\\
-	Fold 6	 &	0.8994	&	0.7603	 &	0.8477\\
-	Fold 7	 &	0.9110	&	0.7822	 &	0.8523\\
-	Fold 8	 &	0.8408	&	0.7705	 &	0.8717\\
-	Fold 9	 &	0.8689	&	0.7698	 &	0.8462\\
-	Fold 10	 &	0.8608	&	0.7811	 &	0.8696\\
-		\hline
-		Ave.: &		&		&			\\
-		Weighted ave.: &	&	&			\\
-		\hline
+	\begin{tabular}{r | c c c}
+	\hline
+	Fold	&	Recall	&	Precision& $F1$ \\
+	\hline
+	1	 &	0.8645	&	0.7569	&	0.8618\\
+	2	 &	0.8722	&	0.7702	&	0.8775\\
+	3	 &	0.8726	&	0.7776	&	0.8656\\
+	4	 &	0.8794	&	0.7599	&	0.8322\\
+	5	 &	0.8924	&	0.7920	&	0.8626\\
+	6	 &	0.8994	&	0.7603	&	0.8477\\
+	7	 &	0.9110	&	0.7822	&	0.8523\\
+	8	 &	0.8408	&	0.7705	&	0.8717\\
+	9	 &	0.8689	&	0.7698	&	0.8462\\
+	10	 &	0.8608	&	0.7811	&	0.8696\\
+	\hline
+	Average &		&		&			\\
+	\hline
 	\end{tabular}
 	\end{center}
 	\caption{10-fold validation using add-one smoothing}
@@ -109,32 +112,64 @@ throughout the other tags, such that they do not affect the other recall
 measures much. This suggests that the probability distributions given after 
 smoothing spread the density out over the words and part of speech tags too 
 much.
-\subsection{Witten-Bell smoothing}
-The results are shown in Table \ref{wbresult}.
+
+Using \textbf{Witten-Bell smoothing}, there are fewer occurrences of such 
+problems. This means, compared to add-one smoothing, Witten-Bell smoothing gives 
+a better estimate of unseen instances of words given tags and tags given tags, 
+resulting in a better overall prediction. The results are shown in Table 
+\ref{wbresult}.
 \begin{table}
 	\begin{center}
-	\begin{tabular}{r | l l l}
-		\hline
-		&	Recall	&	Precision& $F1$ \\
-		\hline
-	Fold 1  &	0.8541	 &	0.8414	 &	0.8719\\
-	Fold 2  &	0.8715	 &	0.8978	 &	0.8697\\
-	Fold 3  &	0.8595	 &	0.9022	 &	0.8723\\
-	Fold 4  &	0.8645	 &	0.8719	 &	0.8837\\
-	Fold 5  &	0.8890	 &	0.8899	 &	0.9024\\
-	Fold 6  &	0.8890	 &	0.8766	 &	0.8802\\
-	Fold 7  &	0.8924	 &	0.8944	 &	0.8877\\
-	Fold 8  &	0.8479	 &	0.8773	 &	0.8520\\
-	Fold 9  &	0.8468	 &	0.8780	 &	0.8736\\
-	Fold 10 &	0.8677	 &	0.8929	 &	0.8769\\
-		\hline
-		Ave.: &		&		&			\\
-		Weighted ave.: &	&	&			\\
-		\hline
+	\begin{tabular}{r | c c c}
+	\hline
+	Fold	&	Recall	&	Precision	&	$F1$ \\
+	\hline
+	1		&	0.8541	&	0.8414		&	0.8719\\
+	2		&	0.8715	&	0.8978		&	0.8697\\
+	3		&	0.8595	&	0.9022		&	0.8723\\
+	4		&	0.8645	&	0.8719		&	0.8837\\
+	5		&	0.8890	&	0.8899		&	0.9024\\
+	6		&	0.8890	&	0.8766		&	0.8802\\
+	7		&	0.8924	&	0.8944		&	0.8877\\
+	8		&	0.8479	&	0.8773		&	0.8520\\
+	9		&	0.8468	&	0.8780		&	0.8736\\
+	10		&	0.8677	&	0.8929		&	0.8769\\
+	\hline
+	Average	&		&		&			\\
+	\hline
 	\end{tabular}
 
 	\end{center}
 	\caption{10-fold validation using Witten-Bell smoothing}
 	\label{wbresult}
 \end{table}
+\subsection{Evaluating using \texttt{sents.devt}}
+
+With these results, we selected the Witten-Bell smoothing technique, and trained 
+the tagger using all instances in \texttt{sents.train}, and tested it using the 
+\texttt{sents.devt} file. This gave us a recall, precision and $F1$ measure of 
+0.8878, 0.9333 and 	0.9015 respectively.
+
+So, how can we improve upon this? Looking at the breakdown given the parts of 
+speech and their individual performance, we can know where our tagger breaks 
+down, and suggest improvements to our preprocessing and smoothing steps. The 
+following are some of the parts of speech tags that perform poorly:
+\begin{description}
+	\item[NNPS] (Proper Noun, plural) Looking up the confusion matrix produced 
+		through the evaluation, a considerable amount of the mistakes made for 
+		NNPS were due to misclassifications of these tokens as NNS and NNP. One 
+		possible remedy for this is to be able to give a word that starts with a 
+		capital letter and ending with an `s' a higher probability of being an 
+		NNPS. This could be done as a special case within the smoothing step 
+		given an unseen word.
+	\item[RBR] (Adverb, comparative) Some words which should be tagged as RBR 
+		are tagged as JJR. This makes sense due to the large number of overlap 
+		in the type of words used.
+	\item[LS] (List item marker) These are hard to distinguish from usual 
+		mentions of numbers. This is especially since one of our preprocessing 
+		steps was to make all instances of digits the same. One possible way of 
+		dealing with this would be not to modify the first tokens of a sentence, 
+		since the LS tokens appear at the start pretty often.
+\end{description}
+
 \end{document}

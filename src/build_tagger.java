@@ -217,7 +217,6 @@ public class build_tagger {
 			Tagger t = new Tagger(reader);
 			System.out.println("Saving model...");
 			save(modelFile, t);
-
 			//t.setSmootherPosPos(wbBuilder(t));
 			//t.setSmootherPosWord(wbBuilder(t));
 			reader.close();
