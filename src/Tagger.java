@@ -103,15 +103,15 @@ public class Tagger implements Serializable {
 	}
 	
 	private String filterToken(String token) {
-		token = token.toLowerCase();
+		//token = token.toLowerCase();
 		token = token.replaceAll("[0-9]", "\\#");
 		return token;
 	}
 	
 	public String[] getTags(String[] words) {
 		Set<String> POS = countPos.keySet();
-		Hashtable<String, String>[] t =	new Hashtable[words.length + 1];
-		Hashtable<String,Double>[] V =	new Hashtable[words.length + 1];
+		Hashtable<String, String>[] t = new Hashtable[words.length + 1];
+		Hashtable<String,Double>[] V  = new Hashtable[words.length + 1];
 		V[0] = new Hashtable<String, Double>();
 		V[0].put("^", 0.0);
 		for (int i = 0; i < words.length; i++) {
@@ -159,25 +159,19 @@ public class Tagger implements Serializable {
 	}
 	
 	public abstract class Smoother implements Serializable {
-		/**
-		 * 
-		 */
 		private static final long serialVersionUID = -1349808820264498844L;
 		Hashtable<String,Hashtable<String,Integer>> countCtxCur;
 		Hashtable<String,Integer> 					countCtx;
 		Hashtable<String,Hashtable<String,Integer>> countCurCtx;
 		Hashtable<String,Integer>					countCur;
 		Set<String> vocab;
-		
 		public double alpha(String ctx, String cur) {
 			return (countCtxCur.get(ctx).get(cur) + 1)/
 					(double)(countCtx.get(ctx) + vocab.size());
 		}
-		
 		public double gamma(String ctx) {
 			return 1;
 		}
-		
 		public double pSmooth(String ctx, String w) {
 			return 1/(double)(countCtx.get(ctx) + vocab.size());
 		}

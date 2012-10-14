@@ -1,6 +1,7 @@
 Learning tags using data from a2_data/sents.train...
 Saving model...
 Testing model using data from a2_data/sents.devt...
+Took 74786 ms to tag 1993 lines. 
      	 NNPS    JJ   POS   RBS   RBR   PRP    MD    FW    VB    LS    IN -LRB-     :    RP   JJS   JJR    CD    CC   WP$   WRB    UH     .     ,    RB    EX   VBZ     $     #   NNS   PDT    ``   VBP   NNP   VBN    NN    TO   VBG    WP   VBD -RRB-   WDT  PRP$    ''    DT 
  NNPS	   90     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0    36     0     0     0    22     0     2     0     0     0     0     0     0     0     0     0 
 
@@ -91,7 +92,7 @@ Testing model using data from a2_data/sents.devt...
    DT	    0     0     0     0     0     0     0     0     0     0     8     0     0     0     0     0     0     5     0     0     0     0     0     6     0     0     0     0     0     2     0     0     0     0     7     0     0     0     0     0    19     0     0  4128 
 
   POS	 Rec.	Prec.	F1
-	 NNPS	0.7692	0.6000	0.6742
+ NNPS	0.7692	0.6000	0.6742
    JJ	0.8075	0.9345	0.8664
   POS	0.9953	0.9977	0.9965
   RBS	0.7619	1.0000	0.8649
@@ -104,7 +105,7 @@ Testing model using data from a2_data/sents.devt...
    IN	0.9898	0.9684	0.9790
 -LRB-	1.0000	1.0000	1.0000
     :	1.0000	1.0000	1.0000
-		RP	0.5111	0.8415	0.6359
+   RP	0.5111	0.8415	0.6359
   JJS	0.9880	0.8913	0.9371
   JJR	0.9305	0.7699	0.8426
    CD	0.9957	0.9812	0.9884
@@ -118,7 +119,7 @@ Testing model using data from a2_data/sents.devt...
    EX	1.0000	1.0000	1.0000
   VBZ	0.9809	0.9514	0.9659
     $	1.0000	1.0000	1.0000
-	 #		0.3000	0.4000	0.3429
+    #	0.3000	0.4000	0.3429
   NNS	0.9544	0.9442	0.9493
   PDT	0.9000	1.0000	0.9474
    ``	1.0000	1.0000	1.0000

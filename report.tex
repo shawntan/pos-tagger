@@ -99,7 +99,7 @@ Using the \textbf{add-one smoothing}, we run 10-fold cross validation using
 	9	 &	0.8689	&	0.7698	&	0.8462\\
 	10	 &	0.8608	&	0.7811	&	0.8696\\
 	\hline
-	Average &		&		&			\\
+Average	 &	0.8762	&	0.7721	&	0.85872\\
 	\hline
 	\end{tabular}
 	\end{center}
@@ -135,7 +135,7 @@ resulting in a better overall prediction. The results are shown in Table
 	9		&	0.8468	&	0.8780		&	0.8736\\
 	10		&	0.8677	&	0.8929		&	0.8769\\
 	\hline
-	Average	&		&		&			\\
+	Average	&	0.86824	&	0.8822		&	0.8770	\\
 	\hline
 	\end{tabular}
 
@@ -151,17 +151,16 @@ the tagger using all instances in \texttt{sents.train}, and tested it using the
 0.8878, 0.9333 and 	0.9015 respectively.
 
 So, how can we improve upon this? Looking at the breakdown given the parts of 
-speech and their individual performance, we can know where our tagger breaks 
-down, and suggest improvements to our preprocessing and smoothing steps. The 
-following are some of the parts of speech tags that perform poorly:
+speech and the confusion matrix, we can know where our tagger breaks down, and 
+suggest improvements to our preprocessing and smoothing steps. The following are 
+some of the parts of speech tags that perform poorly:
 \begin{description}
-	\item[NNPS] (Proper Noun, plural) Looking up the confusion matrix produced 
-		through the evaluation, a considerable amount of the mistakes made for 
-		NNPS were due to misclassifications of these tokens as NNS and NNP. One 
-		possible remedy for this is to be able to give a word that starts with a 
-		capital letter and ending with an `s' a higher probability of being an 
-		NNPS. This could be done as a special case within the smoothing step 
-		given an unseen word.
+	\item[NNPS] (Proper Noun, plural) A considerable amount of the mistakes made 
+		for NNPS were due to misclassifications of these tokens as NNS and NNP. 
+		One possible remedy for this is to be able to give a word that starts 
+		with a capital letter and ending with an `s' a higher probability of 
+		being an NNPS. This could be done as a special case within the smoothing 
+		step given an unseen word.
 	\item[RBR] (Adverb, comparative) Some words which should be tagged as RBR 
 		are tagged as JJR. This makes sense due to the large number of overlap 
 		in the type of words used.
