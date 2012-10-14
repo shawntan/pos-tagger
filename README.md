@@ -1,8 +1,8 @@
 Part-of-Speech Tagger
 =====================
-
 U096883L Shawn Tan
 
+Included source files:
 1. `Tagger.java`: Main part of the program. Contains code for:
 	* Learning transition probabilities from a given text file
 	* Viterbi algorithm for inferring the POS tags for a string

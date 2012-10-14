@@ -155,9 +155,6 @@ public class build_tagger {
 				double Z = vocab.size() - T;
 				double logged = Math.log(T) - ( Math.log(Z) + Math.log(ctxCount + T) );
 				double val = Math.exp(logged);
-				if (
-						(ctx.endsWith("NNPS") || ctx.endsWith("NNS"))
-						&& w.endsWith("s")) val = val*1.5;
 				return val;
 			}
 		};
