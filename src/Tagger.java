@@ -12,7 +12,7 @@ public class Tagger implements Serializable {
 	 */
 	private static final long serialVersionUID = -995737530034898495L;
 	final static private boolean DEBUG = false;
-	final static private String START = "^";
+	final static private String START = "^", END = "$";
 	
 	private Hashtable<String, Hashtable<String, Integer>>	countPos1Pos2;
 	private Hashtable<String, Integer>						countPos1;
@@ -83,6 +83,8 @@ public class Tagger implements Serializable {
 				add(countTokPos, countTok, token, currPos);
 				prevPos = currPos;
 			}
+			add(countPos1Pos2, countPos1, prevPos, END);
+			add(countPos2Pos1, countPos2, END, prevPos);
 		}
 		setSmootherPosPos(new Smoother() {});
 		setSmootherPosWord(new Smoother() {});
@@ -103,7 +105,7 @@ public class Tagger implements Serializable {
 	}
 	
 	private String filterToken(String token) {
-		//token = token.toLowerCase();
+		token = token.toLowerCase();
 		token = token.replaceAll("[0-9]", "\\#");
 		return token;
 	}
@@ -140,8 +142,22 @@ public class Tagger implements Serializable {
 				t[i+1].put(currPOS, maxPOS);
 			}
 		}
-		String[] poss = new String[words.length];
+		//FINAL TOKEN.
+		double maxProb = Double.NEGATIVE_INFINITY;
 		String lastPOS = null;
+		for (String prevPOS : POS) {
+			double tranProb = Math.log(posTransitions(prevPOS,END));
+			double prevProb = V[V.length-1].get(prevPOS);
+			double joinProb = prevProb + tranProb;
+			if(DEBUG) System.out.printf(
+					"%d\t%5s->%s\t%.10f\t%.10f\t%.10f\t%.10f\n" ,
+					V.length,prevPOS,END,tranProb,0,prevProb,joinProb);
+			if (joinProb > maxProb){
+				maxProb = joinProb;
+				lastPOS  = prevPOS;
+			}
+		}
+		String[] poss = new String[words.length];
 		double probPOS = Double.NEGATIVE_INFINITY;
 		for (String pos : V[words.length].keySet()) {
 			double prob = V[words.length].get(pos);

@@ -54,8 +54,8 @@
 \newfontfamily\thinfont[]{Helvetica Neue UltraLight}
 \newfontfamily\headingfont[]{Helvetica Neue Condensed Bold}
 \defaultfontfeatures{Mapping=tex-text}
-\setmainfont[Mapping=tex-text, Color=textcolor]{Times New Roman}
-%\setmainfont[Mapping=tex-text, Color=textcolor]{Helvetica Neue Light}
+%\setmainfont[Mapping=tex-text, Color=textcolor]{Times New Roman}
+\setmainfont[Mapping=tex-text, Color=textcolor]{Helvetica Neue Light}
 %\setmathfont{XITS Math}
 %%%%%%%%%%
 % Header %
@@ -78,7 +78,7 @@ height=9cm] (box) at (current page.north){};
 	  {\bodyfont #1}{\thinfont  #2}
     };
     \node [anchor=north] at (name.south) {%
-      \fontsize{14pt}{24pt}\color{fillheader}%
+	  \fontsize{21pt}{24pt}\color{fillheader}%
       \thinfont #3%
     };
   \end{tikzpicture}

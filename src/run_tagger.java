@@ -46,7 +46,8 @@ public class run_tagger {
 		String modelFile	= args[c++];
 		String outFile		= args[c++];
 		Tagger t = load(modelFile);
-		
+		t.setSmootherPosPos(build_tagger.wbBuilder(t));
+		t.setSmootherPosWord(build_tagger.wbBuilder(t));
 		File fTest = new File(testFile);
 		File fOut  = new File(outFile);
 		

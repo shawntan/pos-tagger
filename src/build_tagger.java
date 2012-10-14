@@ -136,7 +136,7 @@ public class build_tagger {
 
 	}
 
-	private static Tagger.Smoother wbBuilder(Tagger t) {
+	static Tagger.Smoother wbBuilder(Tagger t) {
 		Tagger.Smoother wb = t.new Smoother() {
 			public double gamma(String ctx) {
 				return 1;
@@ -151,12 +151,14 @@ public class build_tagger {
 
 			public double pSmooth(String ctx, String w) {
 				int ctxCount = countCtx.get(ctx);
-				int Z = vocab.size() - countCtxCur.get(ctx).size();
-				int T = countCtxCur.get(ctx).size();
-				double val = Math.log(T)
-						- (Math.log(Z) + Math.log(ctxCount + T));
-				double unlogged = Math.exp(val);
-				return unlogged;
+				double T = countCtxCur.get(ctx).size();
+				double Z = vocab.size() - T;
+				double logged = Math.log(T) - ( Math.log(Z) + Math.log(ctxCount + T) );
+				double val = Math.exp(logged);
+				if (
+						(ctx.endsWith("NNPS") || ctx.endsWith("NNS"))
+						&& w.endsWith("s")) val = val*1.5;
+				return val;
 			}
 		};
 		return wb;
@@ -195,7 +197,6 @@ public class build_tagger {
 					System.out.println(cur + " " + countCurCtx.get(cur));
 					return 0;
 				}
-
 			}
 		};
 		return kneserNey;

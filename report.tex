@@ -56,7 +56,7 @@ would have a higher probability given the tag CD.
 
 Going through the file, we maintain a dictionary of the following items:
 \begin{center}
-\begin{tabular}{l l}
+	\begin{tabular}{l p{10cm}}
 	\hline
 	Name	&	Description\\
 	\hline
@@ -155,20 +155,34 @@ speech and the confusion matrix, we can know where our tagger breaks down, and
 suggest improvements to our preprocessing and smoothing steps. The following are 
 some of the parts of speech tags that perform poorly:
 \begin{description}
-	\item[NNPS] (Proper Noun, plural) A considerable amount of the mistakes made 
-		for NNPS were due to misclassifications of these tokens as NNS and NNP. 
+	\item[NNPS (Proper Noun, plural)] A considerable amount of the mistakes made 
+		for NNPS were due to mis-classifications of these tokens as NNS and NNP.  
 		One possible remedy for this is to be able to give a word that starts 
 		with a capital letter and ending with an `s' a higher probability of 
 		being an NNPS. This could be done as a special case within the smoothing 
-		step given an unseen word.
-	\item[RBR] (Adverb, comparative) Some words which should be tagged as RBR 
+		step given an unseen word. Another option would be to use finite state 
+		transducers to break-down the morphology of the word.
+	\item[RBR (Adverb, comparative)] Some words which should be tagged as RBR 
 		are tagged as JJR. This makes sense due to the large number of overlap 
-		in the type of words used.
-	\item[LS] (List item marker) These are hard to distinguish from usual 
-		mentions of numbers. This is especially since one of our preprocessing 
+		in the type of words used. Looking at the tags that appear before and 
+		after the occurences of RBR, they also seem to be rather similar. One 
+		possibility to fix this would be to have higher order Markov chains for 
+		the HMM.
+	\item[LS (List item marker)] These are hard to distinguish from usual 
+		mentions of numbers.  This is especially since one of our preprocessing 
 		steps was to make all instances of digits the same. One possible way of 
 		dealing with this would be not to modify the first tokens of a sentence, 
 		since the LS tokens appear at the start pretty often.
 \end{description}
 
+\section{Conclusion}
+Despite the use of smoothing, some other optimisations could still be made to 
+further improve the performance of our tagger. These include using a Markov 
+Chain with order greater than 1, accounting for plurality using transducers, and 
+taking into account the position of the word in the sentence. These, however, 
+fall outside the scope of the assignment.
+
+We have, however, ascertained that using Witten-Bell smoothing for POS tagging 
+works reasonably well compared to Add-one smoothing. We are also confident that 
+our POS tagger works well, in most cases.
 \end{document}
