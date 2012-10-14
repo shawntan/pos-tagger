@@ -4,9 +4,9 @@ Part-of-Speech Tagger
 U096883L Shawn Tan
 
 1. `Tagger.java`: Main part of the program. Contains code for:
-	# Learning transition probabilities from a given text file
-	# Viterbi algorithm for inferring the POS tags for a string
-	# Smoothing method is modular, and implemented by extending (and then adding) the `Smoother` inner class.
+	* Learning transition probabilities from a given text file
+	* Viterbi algorithm for inferring the POS tags for a string
+	* Smoothing method is modular, and implemented by extending (and then adding) the `Smoother` inner class.
 
 2. `build_tagger.java` : Implements codes that instantiates `Tagger` and initiates learning.
 	On running `java build_tagger train_file test_file model_file`, the following occurs:
