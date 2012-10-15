@@ -41,11 +41,11 @@ precision, recall and F1 measures.
 The \texttt{sents.train} dataset contains 39,832 lines, each word annotated with 
 POS tags. In order to extract the relevant information we count the transitions.
 
-In order to obtain $\transprob$, we need to count the different number of times 
-one tag is followed by another. For each line, we extract the POS for each 
-token, leaving a list of POS tags. We then prepend a `{\char`\^}' at the 
-beginning, and a `\$' character at the end. This ensures that the probabilities 
-for a given POS starting a sentence are also taken into account.
+To obtain $\transprob$, we need to count the different number of times one tag 
+is followed by another. For each line, we extract the POS for each token, 
+leaving a list of POS tags. We then prepend a `{\char`\^}' at the beginning, and 
+a `\$' character at the end. This ensures that the probabilities for a given POS 
+starting a sentence are also taken into account.
 
 Another preprocessing step performed was to change all instances of numeric 
 tokens, and replacing all digits with \textbackslash\#. For example, `\$25.50' 
@@ -60,11 +60,11 @@ Going through the file, we maintain a dictionary of the following items:
 	\hline
 	Name	&	Description\\
 	\hline
-	$C(q_{t-1},q_t)$	& The number of times a POS tag occurs at time $t$ 
+	$C(s_{t-1},s_t)$	& The number of times a POS tag occurs at time $t$ 
 	after a POS tag occurs at time $t-1$ \\
-	$C(q_t,q_{t-1})$	& Count of transitions in reverse. \\
-	$C(q,w)$	& Count of words given a POS tag. \\
-	$C(w,q)$	& Count of POS tags given a word.\\
+	$C(s_t,s_{t-1})$	& Count of transitions in reverse. \\
+	$C(s,w)$	& Count of words given a POS tag. \\
+	$C(w,s)$	& Count of POS tags given a word.\\
 	\hline
 \end{tabular}
 \end{center}
@@ -99,7 +99,7 @@ Using the \textbf{add-one smoothing}, we run 10-fold cross validation using
 	9	 &	0.8689	&	0.7698	&	0.8462\\
 	10	 &	0.8608	&	0.7811	&	0.8696\\
 	\hline
-Average	 &	0.8762	&	0.7721	&	0.85872\\
+Average	 &	0.8762	&	0.7721	&	0.8587\\
 	\hline
 	\end{tabular}
 	\end{center}
@@ -135,7 +135,7 @@ resulting in a better overall prediction. The results are shown in Table
 	9		&	0.8468	&	0.8780		&	0.8736\\
 	10		&	0.8677	&	0.8929		&	0.8769\\
 	\hline
-	Average	&	0.86824	&	0.8822		&	0.8770	\\
+	Average	&	0.8682	&	0.8822		&	0.8770	\\
 	\hline
 	\end{tabular}
 
@@ -164,10 +164,12 @@ some of the parts of speech tags that perform poorly:
 		transducers to break-down the morphology of the word.
 	\item[RBR (Adverb, comparative)] Some words which should be tagged as RBR 
 		are tagged as JJR. This makes sense due to the large number of overlap 
-		in the type of words used. Looking at the tags that appear before and 
+		in the type of words used. Looking at the tags
+ that appear before and 
 		after the occurences of RBR, they also seem to be rather similar. One 
 		possibility to fix this would be to have higher order Markov chains for 
-		the HMM.
+		the HMM, as the distinction between JJR and RBR may be more evident 
+		further before (or after) the current token.
 	\item[LS (List item marker)] These are hard to distinguish from usual 
 		mentions of numbers.  This is especially since one of our preprocessing 
 		steps was to make all instances of digits the same. One possible way of 
@@ -182,7 +184,10 @@ Chain with order greater than 1, accounting for plurality using transducers, and
 taking into account the position of the word in the sentence. These, however, 
 fall outside the scope of the assignment.
 
-We have, however, ascertained that using Witten-Bell smoothing for POS tagging 
-works reasonably well compared to Add-one smoothing. We are also confident that 
-our POS tagger works well, in most cases.
+We have, however, obtained results that suggest using Witten-Bell smoothing for 
+POS tagging works reasonably well compared to Add-one smoothing. We are also 
+confident that our POS tagger works well in most cases.
+
+The code for this assignment can be found at  
+\url{https://github.com/shawntan/pos-tagger}.
 \end{document}

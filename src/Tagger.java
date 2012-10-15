@@ -27,14 +27,14 @@ public class Tagger implements Serializable {
 	private Smoother smootherPosPos;
 
 	public Tagger(BufferedReader reader) throws IOException {
-		this.countPos1Pos2		= new Hashtable<String, Hashtable<String, Integer>>();
-		this.countPos2Pos1		= new Hashtable<String, Hashtable<String, Integer>>();
-		this.countPosTok		= new Hashtable<String, Hashtable<String, Integer>>();
-		this.countTokPos		= new Hashtable<String, Hashtable<String, Integer>>();
-		this.countPos			= new Hashtable<String, Integer>();
-		this.countTok			= new Hashtable<String, Integer>();
-		this.countPos1			= new Hashtable<String, Integer>();
-		this.countPos2			= new Hashtable<String, Integer>();
+		this.countPos1Pos2	= new Hashtable<String, Hashtable<String, Integer>>();
+		this.countPos2Pos1	= new Hashtable<String, Hashtable<String, Integer>>();
+		this.countPosTok	= new Hashtable<String, Hashtable<String, Integer>>();
+		this.countTokPos	= new Hashtable<String, Hashtable<String, Integer>>();
+		this.countPos		= new Hashtable<String, Integer>();
+		this.countTok		= new Hashtable<String, Integer>();
+		this.countPos1		= new Hashtable<String, Integer>();
+		this.countPos2		= new Hashtable<String, Integer>();
 		learn(reader);
 	}
 
